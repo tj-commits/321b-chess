@@ -1,6 +1,12 @@
 "use client";
 import { useState, useEffect } from "react";
-import PgnPreview from "@/components/PgnPreview";
+import dynamic from 'next/dynamic';
+
+// Import the preview component but tell Next.js NOT to pre-render it on the server
+const PgnPreview = dynamic(() => import('@/components/PgnPreview'), { 
+  ssr: false,
+  loading: () => <div className="h-[400px] bg-gray-100 animate-pulse rounded-3xl" />
+});
 
 export default function AdminDashboard() {
   const [files, setFiles] = useState([]);
