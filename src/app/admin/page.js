@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import PgnPreview from "@/components/PgnPreview";
 
 export default function AdminDashboard() {
   const [files, setFiles] = useState([]);
@@ -18,70 +19,82 @@ export default function AdminDashboard() {
 
   const viewFile = async (file) => {
     setSelectedFile(file.name);
-    setContent("Loading content...");
-    try {
-      const res = await fetch(file.download_url);
-      const text = await res.text();
-      setContent(text);
-    } catch (err) {
-      setContent("Error loading file.");
-    }
+    setContent(""); // Clear previous content to force component remount
+    const res = await fetch(file.download_url);
+    const text = await res.text();
+    setContent(text);
   };
 
-  if (loading) return <div className="p-10 text-center font-bold">Loading Submissions...</div>;
+  if (loading) return <div className="p-10 text-center font-black">LOADING LAB...</div>;
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
-      <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-black text-gray-900 mb-8 uppercase tracking-tighter">
-          Editor Dashboard <span className="text-red-600">/ Submissions</span>
-        </h1>
+    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+      <div className="max-w-[1600px] mx-auto">
+        
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-3xl font-black tracking-tighter uppercase italic">
+            321B <span className="text-red-600">Review Station</span>
+          </h1>
+        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* File List */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 h-[70vh] overflow-y-auto">
-            <div className="p-4 border-b border-gray-100 bg-gray-50 sticky top-0">
-              <p className="text-xs font-bold text-gray-400 uppercase">Recent Uploads ({files.length})</p>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          
+          {/* LEFT: SUBMISSION LIST */}
+          <div className="lg:col-span-3 bg-white rounded-3xl border border-gray-200 shadow-sm h-[85vh] overflow-hidden flex flex-col">
+            <div className="p-4 bg-gray-50 border-b font-black text-[10px] text-gray-400 uppercase tracking-[0.2em]">
+              Inbox ({files.length})
             </div>
-            {files.map((file) => (
-              <button
-                key={file.sha}
-                onClick={() => viewFile(file)}
-                className={`w-full text-left p-4 border-b border-gray-50 hover:bg-red-50 transition-colors ${
-                  selectedFile === file.name ? "bg-red-100 border-red-200" : ""
-                }`}
-              >
-                <p className="text-sm font-bold text-gray-800 truncate">{file.name}</p>
-                <p className="text-[10px] text-gray-400 uppercase">Click to preview</p>
-              </button>
-            ))}
+            <div className="overflow-y-auto flex-1">
+              {files.map((file) => (
+                <button
+                  key={file.sha}
+                  onClick={() => viewFile(file)}
+                  className={`w-full text-left p-5 border-b border-gray-50 transition-all ${
+                    selectedFile === file.name ? "bg-red-50 border-r-4 border-r-red-600" : "hover:bg-gray-50"
+                  }`}
+                >
+                  <p className="text-sm font-bold text-gray-900 truncate">{file.name.replace('.txt', '')}</p>
+                </button>
+              ))}
+            </div>
           </div>
 
-          {/* Content Viewer */}
-          <div className="md:col-span-2 bg-white rounded-2xl shadow-lg border border-gray-200 flex flex-col h-[70vh]">
-            {selectedFile ? (
-              <>
-                <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-900 text-white rounded-t-2xl">
-                  <h3 className="font-mono text-sm">{selectedFile}</h3>
-                  <button 
-                    onClick={() => navigator.clipboard.writeText(content)}
-                    className="text-xs bg-red-600 px-3 py-1 rounded-full font-bold hover:bg-red-700"
-                  >
-                    Copy PGN
-                  </button>
-                </div>
-                <textarea
-                  readOnly
-                  value={content}
-                  className="flex-1 p-6 font-mono text-sm text-gray-800 bg-white outline-none resize-none"
-                />
-              </>
+          {/* CENTER: THE PRO VIEWER */}
+          <div className="lg:col-span-6 space-y-4">
+            {content ? (
+              <PgnPreview pgn={content} id="board-container" key={selectedFile} />
             ) : (
-              <div className="flex-1 flex items-center justify-center text-gray-400 italic">
-                Select a game from the list to view the PGN
+              <div className="h-[500px] flex items-center justify-center bg-gray-100 rounded-3xl border-2 border-dashed border-gray-300 text-gray-400 font-bold uppercase tracking-widest italic">
+                Select a game to scrub moves
               </div>
             )}
           </div>
+
+          {/* RIGHT: EDITOR NOTES & CREDIT */}
+          <div className="lg:col-span-3 space-y-4">
+             <div className="bg-black text-white p-6 rounded-3xl shadow-xl h-[85vh] flex flex-col border border-gray-800">
+                <div className="flex justify-between items-center mb-6">
+                  <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Credit Info</span>
+                  <button 
+                    onClick={() => navigator.clipboard.writeText(content)}
+                    className="bg-white text-black text-[10px] px-3 py-1 rounded-full font-black hover:bg-red-600 hover:text-white transition-all"
+                  >
+                    COPY RAW
+                  </button>
+                </div>
+                
+                {/* The "Credit:" line we added in the submit page */}
+                <div className="text-red-500 font-bold text-sm mb-4 border-b border-white/10 pb-4">
+                   {content.split('\n\n')[0] || "No credit found"}
+                </div>
+
+                <div className="flex-1 overflow-y-auto text-[10px] font-mono text-gray-400 leading-relaxed">
+                  <p className="uppercase mb-2 text-gray-600 font-bold italic">Full Headers:</p>
+                  {content.split('\n\n').slice(1).join('\n\n')}
+                </div>
+             </div>
+          </div>
+
         </div>
       </div>
     </div>
