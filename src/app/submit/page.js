@@ -48,8 +48,8 @@ export default function SubmitGame() {
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             I’m looking for games to feature in my next chess edits. 
             If your game is chosen by me, you'll be featured and credited on 
-            <Link href="https://youtube.com/@321bproductions" target="_blank" className="text-red-600 font-semibold hover:underline ml-1">
-              321B Productions
+            <Link href="https://youtube.com/@rookfxs" target="_blank" className="text-red-600 font-semibold hover:underline ml-1">
+              RookFXs
             </Link>.
           </p>
         </div>
@@ -84,7 +84,7 @@ export default function SubmitGame() {
               className="block bg-gray-900 text-white p-6 rounded-2xl hover:bg-black transition-colors"
             >
               <p className="text-xs uppercase tracking-widest text-gray-400 mb-1">Visit the channel</p>
-              <h4 className="text-xl font-bold">321B Productions →</h4>
+              <h4 className="text-xl font-bold">RookFXs →</h4>
             </Link>
           </div>
 
